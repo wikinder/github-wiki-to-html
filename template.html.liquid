@@ -1,0 +1,183 @@
+{%
+  # All-in-one template for the home page and article pages.
+%}
+<!DOCTYPE html>
+<html lang="en">
+  {% if is_home %}
+    <head prefix="og: https://ogp.me/ns#">
+  {% else %}
+    <head prefix="og: https://ogp.me/ns# article: https://ogp.me/ns/article#">
+  {% endif %}
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <meta name="format-detection" content="telephone=no">
+
+    {% if is_home %}
+      <title>{{ site_name }}</title>
+    {% else %}
+      <title>{{ main_heading }}</title>
+    {% endif %}
+
+    <link rel="stylesheet" href="{{ stylesheet_url }}">
+
+    {% if has_math %}
+      <!-- MathJax -->
+      <script defer src="{{ mathjax_config_script_url }}"></script>
+      <script
+        defer
+        src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/startup.js"
+        integrity="sha512-bTOpOLAF7Z74dLZ3Z3jfQE7SH0mFuuneuOQR+/3EP811prUfVzgtQLPAnIFGlAXc5fs9b1dIjfi8zd4Px1xrAQ=="
+        crossorigin="anonymous"
+      ></script>
+      <!-- /MathJax -->
+    {% endif %}
+
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="license" href="{{ license_url }}">
+
+    {% if is_home %}
+      <meta name="author" content="{{ publisher_name }}">
+    {% else %}
+      <meta name="author" content="{{ author_name }}">
+    {% endif %}
+
+    <!-- OG meta tags -->
+    {% if is_home %}
+      <meta property="og:type" content="website">
+      <meta property="og:title" content="{{ site_name }}">
+    {% else %}
+      <meta property="og:type" content="article">
+      <meta property="og:title" content="{{ main_heading }}">
+    {% endif %}
+
+    <meta property="og:url" content="{{ canonical_url }}">
+    <meta property="og:image" content="{{ publisher_logo_url }}">
+    <meta property="og:site_name" content="{{ site_name }}">
+
+    {% unless is_home %}
+      <meta property="article:published_time" content="{{ published_date_iso }}">
+      <meta property="article:modified_time" content="{{ modified_date_iso }}">
+    {% endunless %}
+    <!-- /OG meta tags -->
+
+    <!-- X Card meta tags -->
+    <meta name="twitter:card" content="summary">
+    <!-- /X Card meta tags -->
+
+    <!-- Structured data -->
+    {% if is_home %}
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "{{ site_name }}",
+          "url": "{{ canonical_url }}",
+          "image": "{{ publisher_logo_url }}",
+          "license": "{{ license_url }}",
+          "author": {
+            "@type": "Organization",
+            "name": "{{ publisher_name }}",
+            "url": "{{ publisher_url }}",
+            "logo": "{{ publisher_logo_url }}"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "{{ publisher_name }}",
+            "url": "{{ publisher_url }}",
+            "logo": "{{ publisher_logo_url }}"
+          }
+        }
+      </script>
+    {% else %}
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "headline": "{{ main_heading }}",
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "{{ canonical_url }}"
+          },
+          "image": "{{ publisher_logo_url }}",
+          "datePublished": "{{ published_date_iso }}",
+          "dateModified": "{{ modified_date_iso }}",
+          "license": "{{ license_url }}",
+          "author": {
+            "@type": "Person",
+            "name": "{{ author_name }}",
+            "url": "{{ author_url }}"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "{{ publisher_name }}",
+            "url": "{{ publisher_url }}",
+            "logo": "{{ publisher_logo_url }}"
+          }
+        }
+      </script>
+    {% endif %}
+    <!-- /Structured data -->
+  </head>
+  <body>
+    <!-- Page header -->
+    <header>
+      <nav>
+        <p>
+          {% if is_home %}
+            {% for page in all_pages %}
+              <a href="{{ page.url }}">{{ page.title }}</a>
+
+              {% unless forloop.last %}
+                ·
+              {% endunless %}
+            {% endfor %}
+          {% else %}
+            <a href="{{ home_url }}">{{ site_name }}</a>
+          {% endif %}
+        </p>
+      </nav>
+    </header>
+    <!-- /Page header -->
+
+    <!-- Page body -->
+    <main>
+      <article>
+        <!-- Article header -->
+        <header>
+          <h1>{{ main_heading }}</h1>
+
+          {% unless is_home %}
+            <p>
+              <time datetime="{{ published_date_iso }}">{{ published_date_display }}</time>
+
+              {% if is_modified %}
+                · 🕒
+                <time datetime="{{ modified_date_iso }}">{{ modified_date_display }}</time>
+              {% endif %}
+            </p>
+          {% endunless %}
+        </header>
+        <!-- /Article header -->
+
+        <!-- Article body -->
+        <div>
+          {{ article_body_html }}
+        </div>
+        <!-- /Article body -->
+      </article>
+    </main>
+    <!-- /Page body -->
+
+    <!-- Page footer -->
+    <footer>
+      {{ page_footer_html }}
+
+      <p>
+        <a href="{{ wiki_page_url }}">Edit this page</a>
+      </p>
+    </footer>
+    <!-- /Page footer -->
+  </body>
+</html>
